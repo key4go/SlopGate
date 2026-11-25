@@ -4,4 +4,4 @@ coverage/
 *.log
 .env
 .env.local
-server/dist/
+# server/dist is committed so the local plugin runs out of the box.
