@@ -1,0 +1,13 @@
+{
+  "name": "slopgate-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SlopGate — catch AI code smell before Codex finishes.",
+  "scripts": {
+    "setup": "npm --prefix plugins/slopgate install",
+    "build": "npm --prefix plugins/slopgate run build",
+    "test": "npm --prefix plugins/slopgate test",
+    "scan": "npm --prefix plugins/slopgate run scan --",
+    "demo": "node plugins/slopgate/test/demo.mjs"
+  }
+}

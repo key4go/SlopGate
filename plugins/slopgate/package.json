@@ -1,0 +1,25 @@
+{
+  "name": "slopgate",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Catch AI code smell before Codex finishes.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "esbuild server/index.mjs --bundle --platform=node --format=esm --outfile=server/dist/index.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:watch": "node --test --watch test/*.test.mjs",
+    "scan": "node cli.mjs",
+    "demo": "node test/demo.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.24.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

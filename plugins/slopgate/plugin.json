@@ -1,0 +1,33 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "slopgate",
+  "version": "0.1.0",
+  "description": "Catch AI code smell before Codex finishes.",
+  "author": {
+    "name": "SlopGate"
+  },
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "ai",
+    "lint",
+    "diff",
+    "code-quality"
+  ],
+  "extensions": {
+    "com.openai": {
+      "hooks": "./hooks/hooks.json",
+      "interface": {
+        "displayName": "SlopGate",
+        "shortDescription": "Catch AI code smell before Codex finishes.",
+        "longDescription": "SlopGate scans the current git diff for empty catches, hardcoded secrets, disabled type checks, placeholders, test focus/skip, and debug leftovers. It blocks Codex from finishing or committing while blockers remain.",
+        "developerName": "SlopGate",
+        "category": "Productivity",
+        "defaultPrompt": [
+          "Check this change with SlopGate before calling it done."
+        ],
+        "brandColor": "#F97316"
+      }
+    }
+  }
+}

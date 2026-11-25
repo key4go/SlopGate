@@ -1,0 +1,11 @@
+interface:
+  display_name: "SlopGate"
+  short_description: "Catch AI code smell before Codex finishes"
+  default_prompt: "Check this change with SlopGate before calling it done."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "slopgate"
+      description: "SlopGate diff scanner"
+      transport: "stdio"
