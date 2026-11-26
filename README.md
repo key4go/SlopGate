@@ -37,6 +37,14 @@ Before Git, the second hook checks the staged diff (or the outgoing push range) 
 
 ---
 
+## Swift support
+
+SlopGate scans added lines in `.swift` files for empty `catch` blocks, hardcoded secrets, and unfinished code. It also warns about `print`, `debugPrint`, and `dump`, and recognizes skipped tests using `XCTSkip`, `XCTSkipIf`, `XCTSkipUnless`, or Swift Testing's `.disabled` trait. Swift test files and test-target folders receive the same test-specific severity treatment as other supported tests.
+
+These checks use text patterns, not a Swift parser, so review findings in context. Type-check suppression checks apply to JavaScript and TypeScript, not Swift.
+
+---
+
 ## Install into Codex desktop
 
 Prerequisites: Node.js 20+, Git, and the ChatGPT desktop app with Codex.
