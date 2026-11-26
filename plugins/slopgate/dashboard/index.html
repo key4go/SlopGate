@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>SlopGate Dashboard</title>
+    <style>
+      :root {
+        --bg: #080b10;
+        --panel: rgba(17, 24, 32, 0.86);
+        --panel-solid: #111820;
+        --border: #1e2a36;
+        --border-soft: #17212b;
+        --text: #e7eef6;
+        --muted: #8fa1b5;
+        --faint: #5f7185;
+        --orange: #f97316;
+        --orange-soft: rgba(249, 115, 22, 0.14);
+        --red: #ef4444;
+        --amber: #f59e0b;
+        --blue: #38bdf8;
+        --gray: #64748b;
+        --radius: 16px;
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(900px 500px at 12% -8%, rgba(249, 115, 22, 0.16), transparent 60%),
+          radial-gradient(800px 500px at 100% 0%, rgba(56, 189, 248, 0.08), transparent 55%),
+          var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      code,
+      .mono {
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      }
+
+      .page {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 36px 24px 48px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+        margin-bottom: 24px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .mark {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(145deg, #fb923c, #ea580c);
+        color: #140a03;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        box-shadow: 0 10px 30px rgba(249, 115, 22, 0.28);
+      }
+
+      .eyebrow {
+        margin: 0 0 2px;
+        color: var(--orange);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 40px);
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+
+      .tagline {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .range {
+        display: flex;
+        padding: 3px;
+        background: rgba(17, 24, 32, 0.8);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+
+      .range button,
+      .refresh {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 7px 10px;
+        border-radius: 7px;
+        cursor: pointer;
+      }
+
+      .range button:hover {
+        color: var(--text);
+      }
+
+      .range button.active {
+        background: var(--orange);
+        color: #140a03;
+      }
+
+      .refresh {
+        padding: 9px 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--panel-solid);
+        color: var(--text);
+      }
+
+      .refresh:hover {
+        border-color: #33465a;
+      }
+
+      .refresh:disabled {
+        cursor: wait;
+        opacity: 0.6;
+      }
+
+      button:focus-visible,
+      a:focus-visible {
+        outline: 2px solid var(--orange);
+        outline-offset: 2px;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 150px;
+        max-width: 100%;
+        padding: 9px 12px;
+        background: rgba(12, 17, 24, 0.65);
+        border: 1px solid var(--border-soft);
+        border-radius: 10px;
+      }
+
+      .meta-item span {
+        color: var(--faint);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .meta-item code,
+      .meta-item strong {
+        max-width: 520px;
+        overflow: hidden;
+        color: var(--text);
+        font-size: 12px;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .card {
+        padding: 16px;
+        background: linear-gradient(180deg, rgba(23, 32, 43, 0.92), rgba(13, 19, 26, 0.92));
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      }
+
+      .card.accent {
+        background: linear-gradient(180deg, rgba(249, 115, 22, 0.12), rgba(13, 19, 26, 0.92));
+        border-color: rgba(249, 115, 22, 0.4);
+      }
+
+      .card-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .card strong {
+        display: block;
+        font-size: 30px;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+
+      .card.accent strong {
+        color: var(--orange);
+      }
+
+      .card.danger strong {
+        color: var(--red);
+      }
+
+      .card small {
+        display: block;
+        margin-top: 7px;
+        color: var(--faint);
+        font-size: 11px;
+      }
+
+      .panel {
+        margin-bottom: 14px;
+        padding: 18px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(8px);
+      }
+
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      .panel h2 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: -0.01em;
+      }
+
+      .panel-head p {
+        margin: 4px 0 0;
+        font-size: 12px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .count {
+        color: var(--faint);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 3px;
+      }
+
+      .dot.block {
+        background: var(--red);
+      }
+
+      .dot.warn {
+        background: var(--amber);
+      }
+
+      .dot.info {
+        background: var(--blue);
+      }
+
+      .dot.suppressed {
+        background: var(--gray);
+      }
+
+      .chart-wrap {
+        overflow-x: auto;
+        padding: 4px 0 24px;
+      }
+
+      .chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 4px;
+        height: 210px;
+        min-width: 100%;
+        padding-bottom: 2px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .bar {
+        position: relative;
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        justify-content: flex-end;
+        min-width: 6px;
+        height: 100%;
+      }
+
+      .bar-stack {
+        display: flex;
+        flex-direction: column-reverse;
+        width: 100%;
+        min-height: 2px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.025);
+        border-radius: 3px 3px 0 0;
+      }
+
+      .bar-seg {
+        width: 100%;
+        min-height: 0;
+      }
+
+      .bar-seg.block {
+        background: linear-gradient(180deg, #f87171, var(--red));
+      }
+
+      .bar-seg.warn {
+        background: linear-gradient(180deg, #fbbf24, var(--amber));
+      }
+
+      .bar-seg.info {
+        background: linear-gradient(180deg, #7dd3fc, var(--blue));
+      }
+
+      .bar-label {
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        color: var(--faint);
+        font-size: 9px;
+        white-space: nowrap;
+        transform: translateX(-50%);
+      }
+
+      .chart-empty {
+        display: grid;
+        place-items: center;
+        height: 180px;
+        color: var(--faint);
+        font-size: 12px;
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+      }
+
+      .empty-inline {
+        padding: 8px 0 2px;
+        color: var(--faint);
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      th {
+        padding: 0 0 8px;
+        color: var(--faint);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-align: left;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border);
+      }
+
+      td {
+        padding: 9px 0;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border-soft);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      td.num,
+      th.num {
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+      }
+
+      .rule-name {
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 11px;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 999px;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .pill.block {
+        background: rgba(239, 68, 68, 0.12);
+        color: #fca5a5;
+      }
+
+      .pill.warn {
+        background: rgba(245, 158, 11, 0.12);
+        color: #fcd34d;
+      }
+
+      .pill.info {
+        background: rgba(56, 189, 248, 0.12);
+        color: #7dd3fc;
+      }
+
+      .path {
+        color: var(--muted);
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 11px;
+        word-break: break-all;
+      }
+
+      .recent-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .recent-row {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: rgba(8, 11, 16, 0.35);
+        border: 1px solid var(--border-soft);
+        border-radius: 10px;
+      }
+
+      .recent-icon {
+        display: grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        color: var(--orange);
+        font-size: 10px;
+        font-weight: 800;
+        background: var(--orange-soft);
+        border-radius: 9px;
+      }
+
+      .recent-icon.check {
+        color: var(--blue);
+        background: rgba(56, 189, 248, 0.1);
+      }
+
+      .recent-main {
+        min-width: 0;
+      }
+
+      .recent-title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .recent-meta {
+        margin-top: 2px;
+        overflow: hidden;
+        color: var(--faint);
+        font-size: 11px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .recent-time {
+        color: var(--faint);
+        font-size: 10px;
+        white-space: nowrap;
+      }
+
+      .empty-state {
+        padding: 44px 20px;
+        text-align: center;
+      }
+
+      .empty-icon {
+        display: grid;
+        place-items: center;
+        width: 54px;
+        height: 54px;
+        margin: 0 auto 14px;
+        color: var(--orange);
+        font-weight: 800;
+        background: var(--orange-soft);
+        border: 1px solid rgba(249, 115, 22, 0.25);
+        border-radius: 16px;
+      }
+
+      .empty-state h2 {
+        margin: 0 0 6px;
+        font-size: 18px;
+      }
+
+      .empty-state p {
+        margin: 0 0 14px;
+        color: var(--muted);
+      }
+
+      .empty-state code {
+        display: inline-block;
+        padding: 7px 10px;
+        color: var(--orange);
+        font-size: 12px;
+        background: var(--panel-solid);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      footer {
+        padding-top: 8px;
+        color: var(--faint);
+        font-size: 11px;
+        text-align: center;
+      }
+
+      footer code {
+        color: var(--muted);
+      }
+
+      @media (max-width: 900px) {
+        .cards {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .page {
+          padding: 24px 16px 40px;
+        }
+
+        .topbar {
+          flex-direction: column;
+        }
+
+        .controls {
+          justify-content: flex-start;
+        }
+
+        .cards {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .meta-item {
+          flex: 1;
+          min-width: 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="brand">
+          <div class="mark" aria-hidden="true">SG</div>
+          <div>
+            <p class="eyebrow">Local code quality</p>
+            <h1>SlopGate</h1>
+            <p class="tagline">AI code smell, caught before handoff.</p>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="range" role="group" aria-label="Time range">
+            <button type="button" data-days="7" aria-pressed="false">7d</button>
+            <button type="button" data-days="30" aria-pressed="true">30d</button>
+            <button type="button" data-days="90" aria-pressed="false">90d</button>
+            <button type="button" data-days="all" aria-pressed="false">All</button>
+          </div>
+          <button type="button" id="refresh" class="refresh">Refresh</button>
+        </div>
+      </header>
+
+      <section class="meta" aria-label="Dashboard metadata">
+        <div class="meta-item">
+          <span>Project</span>
+          <code id="project">—</code>
+        </div>
+        <div class="meta-item">
+          <span>Updated</span>
+          <strong id="updated">Loading…</strong>
+        </div>
+        <div class="meta-item">
+          <span>Filter</span>
+          <strong id="range-label">Last 30 days</strong>
+        </div>
+      </section>
+
+      <main>
+        <section id="summary-cards" class="cards" aria-label="Summary">
+          <article class="card">
+            <span class="card-label">Scans</span>
+            <strong id="card-scans">0</strong>
+            <small>Recorded scans</small>
+          </article>
+          <article class="card">
+            <span class="card-label">Handoff checks</span>
+            <strong id="card-checks">0</strong>
+            <small id="card-checks-sub">No handoffs yet</small>
+          </article>
+          <article class="card accent">
+            <span class="card-label">Blockers stopped</span>
+            <strong id="card-blocks">0</strong>
+            <small id="card-block-rate">—</small>
+          </article>
+          <article class="card danger">
+            <span class="card-label">Blocking findings</span>
+            <strong id="card-block-findings">0</strong>
+            <small>At blocked handoffs</small>
+          </article>
+          <article class="card">
+            <span class="card-label">Warnings</span>
+            <strong id="card-warnings">0</strong>
+            <small>Across scans</small>
+          </article>
+          <article class="card">
+            <span class="card-label">Avg score</span>
+            <strong id="card-score">—</strong>
+            <small id="card-score-sub">No scans yet</small>
+          </article>
+        </section>
+
+        <section id="empty-state" class="panel empty-state" hidden>
+          <div class="empty-icon" aria-hidden="true">SG</div>
+          <h2>No SlopGate history yet</h2>
+          <p>Run a scan or let Codex finish a turn. Events stay local in <code>.slopgate/events.jsonl</code>.</p>
+          <code>node cli.mjs scan</code>
+        </section>
+
+        <section id="chart-panel" class="panel chart-panel">
+          <div class="panel-head">
+            <div>
+              <h2>Findings by day</h2>
+              <p id="chart-subtitle" class="muted">Waiting for data…</p>
+            </div>
+            <div class="legend" aria-label="Legend">
+              <span><i class="dot block"></i>Block</span>
+              <span><i class="dot warn"></i>Warn</span>
+              <span><i class="dot info"></i>Info</span>
+              <span><i class="dot suppressed"></i>Suppressed</span>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <div id="chart" class="chart" role="img" aria-label="Findings by day"></div>
+          </div>
+          <div id="chart-empty" class="chart-empty" hidden>No findings in this range.</div>
+        </section>
+
+        <div id="breakdown" class="two-col">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Top rules</h2>
+              <span class="count" id="rules-count">0</span>
+            </div>
+            <div id="top-rules"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Top files</h2>
+              <span class="count" id="files-count">0</span>
+            </div>
+            <div id="top-files"></div>
+          </section>
+        </div>
+
+        <section id="recent-panel" class="panel">
+          <div class="panel-head">
+            <h2>Recent activity</h2>
+            <span class="count" id="recent-count">0</span>
+          </div>
+          <div id="recent"></div>
+        </section>
+      </main>
+
+      <footer>
+        Local only. History lives in <code>.slopgate/events.jsonl</code> and is gitignored.
+      </footer>
+    </div>
+
+    <script>
+      const number = new Intl.NumberFormat();
+      const state = { days: 30, stats: null, loading: false };
+
+      const el = (id) => document.getElementById(id);
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (character) => {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          }[character];
+        });
+      }
+
+      function setActiveRange() {
+        document.querySelectorAll("[data-days]").forEach((button) => {
+          const value =
+            button.dataset.days === "all"
+              ? "all"
+              : Number(button.dataset.days);
+          const active = value === state.days;
+
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+
+        el("range-label").textContent =
+          state.days === "all" ? "All time" : `Last ${state.days} days`;
+      }
+
+      function timeAgo(iso) {
+        const then = new Date(iso).getTime();
+        if (!Number.isFinite(then)) return "—";
+
+        const seconds = Math.max(0, Math.round((Date.now() - then) / 1000));
+        if (seconds < 60) return "just now";
+
+        const minutes = Math.round(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+
+        const hours = Math.round(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+
+        return `${Math.round(hours / 24)}d ago`;
+      }
+
+      function renderCards(stats) {
+        const totals = stats.totals;
+
+        el("card-scans").textContent = number.format(totals.scans);
+        el("card-checks").textContent = number.format(totals.checks);
+        el("card-blocks").textContent = number.format(totals.blocks);
+        el("card-block-findings").textContent = number.format(
+          totals.blockedFindings.block,
+        );
+        el("card-warnings").textContent = number.format(totals.findings.warn);
+        el("card-score").textContent =
+          totals.avgScore == null ? "—" : `${totals.avgScore}`;
+
+        el("card-checks-sub").textContent = totals.checks
+          ? `${totals.cleanChecks} clean · ${totals.waived} waived`
+          : "No handoffs yet";
+
+        el("card-block-rate").textContent = totals.checks
+          ? `${Math.round(stats.blockRate * 100)}% of handoffs`
+          : "—";
+
+        el("card-score-sub").textContent = totals.scans
+          ? "Average scan score"
+          : "No scans yet";
+      }
+
+      function renderChart(stats) {
+        const chart = el("chart");
+        const empty = el("chart-empty");
+        const days = stats.daily;
+        const total = days.reduce(
+          (sum, day) => sum + day.block + day.warn + day.info,
+          0,
+        );
+        const max = Math.max(
+          1,
+          ...days.map((day) => day.block + day.warn + day.info),
+        );
+
+        el("chart-subtitle").textContent = total
+          ? `${number.format(total)} findings across ${stats.chartDays} days`
+          : `No findings in the last ${stats.chartDays} days`;
+
+        if (!total) {
+          chart.innerHTML = "";
+          empty.hidden = false;
+          chart.setAttribute("aria-label", "No findings in this range");
+          return;
+        }
+
+        empty.hidden = true;
+        const step = Math.max(1, Math.ceil(days.length / 8));
+
+        chart.innerHTML = days
+          .map((day, index) => {
+            const dayTotal = day.block + day.warn + day.info;
+            const height = dayTotal
+              ? Math.max(3, Math.round((dayTotal / max) * 100))
+              : 0;
+
+            const segments = [
+              ["block", day.block],
+              ["warn", day.warn],
+              ["info", day.info],
+            ]
+              .filter(([, value]) => value > 0)
+              .map(([severity, value]) => {
+                const segmentHeight = dayTotal
+                  ? (value / dayTotal) * 100
+                  : 0;
+
+                return `<span class="bar-seg ${severity}" style="height:${segmentHeight}%"></span>`;
+              })
+              .join("");
+
+            const label =
+              index % step === 0 || index === days.length - 1
+                ? `<span class="bar-label">${escapeHtml(day.date.slice(5))}</span>`
+                : "";
+
+            const title = `${day.date}: ${day.block} block, ${day.warn} warn, ${day.info} info`;
+
+            return `<div class="bar" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}"><div class="bar-stack" style="height:${height}%">${segments}</div>${label}</div>`;
+          })
+          .join("");
+
+        chart.setAttribute(
+          "aria-label",
+          `Findings by day for the last ${stats.chartDays} days`,
+        );
+      }
+
+      function renderRules(stats) {
+        const container = el("top-rules");
+        el("rules-count").textContent = stats.topRules.length;
+
+        if (!stats.topRules.length) {
+          container.innerHTML = '<p class="muted">No rule hits yet.</p>';
+          return;
+        }
+
+        container.innerHTML = `<table>
+          <thead><tr><th>Rule</th><th>Severity</th><th class="num">Hits</th></tr></thead>
+          <tbody>${stats.topRules
+            .map(
+              (rule) => `<tr>
+                <td class="rule-name">${escapeHtml(rule.rule)}</td>
+                <td><span class="pill ${escapeHtml(rule.severity)}">${escapeHtml(rule.severity)}</span></td>
+                <td class="num">${number.format(rule.count)}</td>
+              </tr>`,
+            )
+            .join("")}</tbody>
+        </table>`;
+      }
+
+      function renderFiles(stats) {
+        const container = el("top-files");
+        el("files-count").textContent = stats.topFiles.length;
+
+        if (!stats.topFiles.length) {
+          container.innerHTML = '<p class="muted">No file hits yet.</p>';
+          return;
+        }
+
+        container.innerHTML = `<table>
+          <thead><tr><th>File</th><th class="num">Block</th><th class="num">Warn</th><th class="num">Info</th><th class="num">Total</th></tr></thead>
+          <tbody>${stats.topFiles
+            .map(
+              (file) => `<tr>
+                <td class="path">${escapeHtml(file.file)}</td>
+                <td class="num">${number.format(file.block)}</td>
+                <td class="num">${number.format(file.warn)}</td>
+                <td class="num">${number.format(file.info)}</td>
+                <td class="num">${number.format(file.count)}</td>
+              </tr>`,
+            )
+            .join("")}</tbody>
+        </table>`;
+      }
+
+      function renderRecent(stats) {
+        const container = el("recent");
+        el("recent-count").textContent = stats.recent.length;
+
+        if (!stats.recent.length) {
+          container.innerHTML = '<p class="muted">No activity yet.</p>';
+          return;
+        }
+
+        container.innerHTML = `<div class="recent-list">${stats.recent
+          .map((event) => {
+            const isCheck = event.type === "check";
+            const label = isCheck ? "Check" : "Scan";
+            const detail = isCheck
+              ? `${event.action ?? "handoff"}${
+                  event.blocked
+                    ? " · blocked"
+                    : event.waived
+                      ? " · waived"
+                      : " · clean"
+                }`
+              : `${event.mode ?? "all"} mode`;
+            const findings = event.findingsCount
+              ? `${event.findingsCount} finding${event.findingsCount === 1 ? "" : "s"}`
+              : "no findings";
+            const score =
+              typeof event.score === "number" ? ` · ${event.score}/100` : "";
+            const topRule = event.topRule ? ` · ${event.topRule}` : "";
+
+            return `<div class="recent-row">
+              <div class="recent-icon ${isCheck ? "check" : ""}">${isCheck ? "CHK" : "SCN"}</div>
+              <div class="recent-main">
+                <div class="recent-title">
+                  ${label}
+                  <span class="muted">${escapeHtml(event.source)}</span>
+                  ${event.blocked ? '<span class="pill block">blocked</span>' : ""}
+                  ${event.waived ? '<span class="pill warn">waived</span>' : ""}
+                </div>
+                <div class="recent-meta">${escapeHtml(detail)} · ${findings}${score}${topRule ? escapeHtml(topRule) : ""}</div>
+              </div>
+              <div class="recent-time" title="${escapeHtml(event.ts)}">${timeAgo(event.ts)}</div>
+            </div>`;
+          })
+          .join("")}</div>`;
+      }
+
+      function setVisible(id, visible) {
+        el(id).hidden = !visible;
+      }
+
+      function render(stats) {
+        state.stats = stats;
+
+        el("project").textContent = stats.project ?? "No project yet";
+        el("project").title = stats.project ?? "";
+        el("updated").textContent = new Date(stats.generatedAt).toLocaleString();
+
+        renderCards(stats);
+        renderChart(stats);
+        renderRules(stats);
+        renderFiles(stats);
+        renderRecent(stats);
+
+        const hasEvents = stats.totals.events > 0;
+
+        setVisible("summary-cards", hasEvents);
+        setVisible("chart-panel", hasEvents);
+        setVisible("breakdown", hasEvents);
+        setVisible("recent-panel", hasEvents);
+        setVisible("empty-state", !hasEvents);
+      }
+
+      async function load(days = state.days) {
+        if (state.loading) return;
+
+        state.loading = true;
+        state.days = days;
+        setActiveRange();
+
+        el("refresh").disabled = true;
+        el("refresh").textContent = "Refreshing…";
+
+        try {
+          const response = await fetch(
+            `/api/stats?days=${encodeURIComponent(days)}`,
+            { cache: "no-store" },
+          );
+
+          if (!response.ok) {
+            throw new Error(`Dashboard returned ${response.status}`);
+          }
+
+          const stats = await response.json();
+          render(stats);
+          el("updated").textContent = new Date(
+            stats.generatedAt,
+          ).toLocaleTimeString();
+        } catch (error) {
+          el("updated").textContent =
+            error instanceof Error ? error.message : "Failed to load";
+        } finally {
+          state.loading = false;
+          el("refresh").disabled = false;
+          el("refresh").textContent = "Refresh";
+        }
+      }
+
+      document.querySelectorAll("[data-days]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const value =
+            button.dataset.days === "all"
+              ? "all"
+              : Number(button.dataset.days);
+
+          load(value);
+        });
+      });
+
+      el("refresh").addEventListener("click", () => load(state.days));
+
+      setActiveRange();
+      load(30);
+
+      setInterval(() => {
+        if (!document.hidden && !state.loading) load(state.days);
+      }, 20000);
+
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && !state.loading) load(state.days);
+      });
+    </script>
+  </body>
+</html>

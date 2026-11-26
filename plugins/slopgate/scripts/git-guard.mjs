@@ -7,7 +7,7 @@ import {
   parseGitCommand,
 } from "../core/git-command.mjs";
 import { getOutgoingRange } from "../core/git.mjs";
-import { formatHookReason, scan } from "../core/index.mjs";
+import { formatHookReason, recordCheck, scan } from "../core/index.mjs";
 
 const FAIL_OPEN_TIMEOUT_MS = 25000;
 
@@ -87,9 +87,19 @@ async function main() {
     return;
   }
 
-  if (result.counts.block === 0) return;
-
   const action = isCommit ? "commit" : "push";
+  const blocked = result.counts.block > 0;
+
+  recordCheck(result, {
+    source: "hook",
+    action,
+    blocked,
+    waived: false,
+    sessionId: input.session_id,
+  });
+
+  if (!blocked) return;
+
   process.stdout.write(
     JSON.stringify({
       hookSpecificOutput: {

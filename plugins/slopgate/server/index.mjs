@@ -4,8 +4,12 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import {
+  buildStats,
   formatMarkdown,
   formatRulesMarkdown,
+  formatStatsMarkdown,
+  readEvents,
+  recordScan,
   ruleMeta,
   scan,
   scanFile,
@@ -92,6 +96,8 @@ server.registerTool(
         paths: paths ?? [],
       });
 
+      recordScan(result, { source: "mcp" });
+
       return {
         content: [
           {
@@ -129,6 +135,8 @@ server.registerTool(
         path: filePath,
       });
 
+      recordScan(result, { source: "mcp" });
+
       return {
         content: [
           {
@@ -137,6 +145,46 @@ server.registerTool(
           },
         ],
         structuredContent: result,
+      };
+    } catch (error) {
+      return errorResult(error);
+    }
+  },
+);
+
+server.registerTool(
+  "stats",
+  {
+    title: "Summarize SlopGate history",
+    description:
+      "Summarize local SlopGate history: scans, handoff checks, blockers stopped, top rules, top files, and recent activity. History stays in the project's .slopgate directory.",
+    inputSchema: {
+      cwd: z
+        .string()
+        .optional()
+        .describe("Absolute path to the project root."),
+      days: z
+        .union([z.number().int().positive(), z.literal("all")])
+        .optional()
+        .describe("Number of days to include, or 'all'. Defaults to 30."),
+    },
+    annotations: READ_ONLY_ANNOTATIONS,
+  },
+  async ({ cwd, days }) => {
+    try {
+      const projectRoot = resolveProjectCwd(cwd);
+      const stats = buildStats(readEvents(projectRoot), {
+        days: days ?? 30,
+      });
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: formatStatsMarkdown(stats),
+          },
+        ],
+        structuredContent: stats,
       };
     } catch (error) {
       return errorResult(error);

@@ -8,3 +8,19 @@ export {
   formatRulesMarkdown,
   formatJson,
 } from "./format.mjs";
+export {
+  HISTORY_DIR,
+  HISTORY_FILE,
+  HISTORY_VERSION,
+  getHistoryDir,
+  getHistoryPath,
+  isHistoryEnabled,
+  readEvents,
+  recordCheck,
+  recordScan,
+} from "./history.mjs";
+export {
+  buildStats,
+  formatStatsMarkdown,
+  normalizeDays,
+} from "./stats.mjs";

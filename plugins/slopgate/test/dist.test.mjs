@@ -27,7 +27,7 @@ test(
       const { tools } = await client.listTools();
       assert.deepEqual(
         tools.map((tool) => tool.name).sort(),
-        ["rules", "scan", "scan_file"],
+        ["rules", "scan", "scan_file", "stats"],
       );
     } finally {
       await client.close().catch(() => {});

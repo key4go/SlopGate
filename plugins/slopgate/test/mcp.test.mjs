@@ -44,7 +44,7 @@ test("MCP server exposes the SlopGate tools", async () => {
     const { tools } = await client.listTools();
     const names = tools.map((tool) => tool.name).sort();
 
-    assert.deepEqual(names, ["rules", "scan", "scan_file"]);
+    assert.deepEqual(names, ["rules", "scan", "scan_file", "stats"]);
   });
 });
 

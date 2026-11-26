@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { formatHookReason, scan } from "../core/index.mjs";
+import { formatHookReason, recordCheck, scan } from "../core/index.mjs";
 
 const FAIL_OPEN_TIMEOUT_MS = 25000;
 
@@ -40,6 +40,17 @@ async function main() {
     );
     return;
   }
+
+  const blocked = result.counts.block > 0 && !input.stop_hook_active;
+  const waived = result.counts.block > 0 && Boolean(input.stop_hook_active);
+
+  recordCheck(result, {
+    source: "hook",
+    action: "handoff",
+    blocked,
+    waived,
+    sessionId: input.session_id,
+  });
 
   if (result.counts.block === 0) {
     return;

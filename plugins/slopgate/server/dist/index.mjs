@@ -3258,8 +3258,8 @@ var require_utils = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path4) {
-      let input2 = path4;
+    function removeDotSegments(path5) {
+      let input2 = path5;
       const output2 = [];
       let nextSlash = -1;
       let len = 0;
@@ -3333,11 +3333,11 @@ var require_utils = __commonJS({
       }
       return output2.join("");
     }
-    function removeDotSegmentsRelative(path4) {
-      if (path4 === "" || path4[0] === "/") {
-        return removeDotSegments(path4);
+    function removeDotSegmentsRelative(path5) {
+      if (path5 === "" || path5[0] === "/") {
+        return removeDotSegments(path5);
       }
-      const segments = path4.split("/");
+      const segments = path5.split("/");
       const last = segments.length - 1;
       const output2 = [];
       let trailingDirectory = false;
@@ -3700,8 +3700,8 @@ var require_schemes = __commonJS({
       }
       if (wsComponent.resourceName) {
         const queryIndex = wsComponent.resourceName.indexOf("?");
-        const path4 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
-        wsComponent.path = path4 && path4 !== "/" ? path4 : void 0;
+        const path5 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
+        wsComponent.path = path5 && path5 !== "/" ? path5 : void 0;
         wsComponent.query = queryIndex === -1 ? void 0 : wsComponent.resourceName.slice(queryIndex + 1);
         wsComponent.resourceName = void 0;
       }
@@ -7252,7 +7252,7 @@ var require_dist = __commonJS({
 });
 
 // server/index.mjs
-import path3 from "node:path";
+import path4 from "node:path";
 
 // node_modules/zod/v3/helpers/util.js
 var util;
@@ -7628,8 +7628,8 @@ function getErrorMap() {
 
 // node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
-  const { data, path: path4, errorMaps, issueData } = params;
-  const fullPath = [...path4, ...issueData.path || []];
+  const { data, path: path5, errorMaps, issueData } = params;
+  const fullPath = [...path5, ...issueData.path || []];
   const fullIssue = {
     ...issueData,
     path: fullPath
@@ -7744,11 +7744,11 @@ var errorUtil;
 
 // node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
-  constructor(parent, value, path4, key) {
+  constructor(parent, value, path5, key) {
     this._cachedPath = [];
     this.parent = parent;
     this.data = value;
-    this._path = path4;
+    this._path = path5;
     this._key = key;
   }
   get path() {
@@ -11704,10 +11704,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path4) {
-  if (!path4)
+function getElementAtPath(obj, path5) {
+  if (!path5)
     return obj;
-  return path4.reduce((acc, key) => acc?.[key], obj);
+  return path5.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -12047,11 +12047,11 @@ function explicitlyAborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path4, issues) {
+function prefixIssues(path5, issues) {
   return issues.map((iss) => {
     var _a3;
     (_a3 = iss).path ?? (_a3.path = []);
-    iss.path.unshift(path4);
+    iss.path.unshift(path5);
     return iss;
   });
 }
@@ -12513,16 +12513,16 @@ function flattenError(error62, mapper = (issue2) => issue2.message) {
 }
 function formatError(error62, mapper = (issue2) => issue2.message) {
   const fieldErrors = { _errors: [] };
-  const processError = (error63, path4 = []) => {
+  const processError = (error63, path5 = []) => {
     for (const issue2 of error63.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path4, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path5, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path4, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path5, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path4, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path5, ...issue2.path]);
       } else {
-        const fullpath = [...path4, ...issue2.path];
+        const fullpath = [...path5, ...issue2.path];
         if (fullpath.length === 0) {
           fieldErrors._errors.push(mapper(issue2));
         } else {
@@ -12561,17 +12561,17 @@ function formatError(error62, mapper = (issue2) => issue2.message) {
 }
 function treeifyError(error62, mapper = (issue2) => issue2.message) {
   const result = { errors: [] };
-  const processError = (error63, path4 = []) => {
+  const processError = (error63, path5 = []) => {
     var _a3;
     for (const issue2 of error63.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path4, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path5, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path4, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path5, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path4, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path5, ...issue2.path]);
       } else {
-        const fullpath = [...path4, ...issue2.path];
+        const fullpath = [...path5, ...issue2.path];
         if (fullpath.length === 0) {
           result.errors.push(mapper(issue2));
           continue;
@@ -12610,8 +12610,8 @@ function treeifyError(error62, mapper = (issue2) => issue2.message) {
 }
 function toDotPath(_path) {
   const segs = [];
-  const path4 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
-  for (const seg of path4) {
+  const path5 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
+  for (const seg of path5) {
     if (typeof seg === "number")
       segs.push(`[${seg}]`);
     else if (typeof seg === "symbol")
@@ -28162,11 +28162,11 @@ function normalizeObjectSchema(schema) {
   }
   return void 0;
 }
-function getDotPath(path4) {
-  if (path4.length === 0) {
+function getDotPath(path5) {
+  if (path5.length === 0) {
     return "object root";
   }
-  return path4.reduce((acc, seg, index) => {
+  return path5.reduce((acc, seg, index) => {
     if (index === 0) {
       return String(seg);
     }
@@ -30393,13 +30393,13 @@ function resolveRef(ref, ctx) {
   if (!ref.startsWith("#")) {
     throw new Error("External $ref is not supported, only local refs (#/...) are allowed");
   }
-  const path4 = ref.slice(1).split("/").filter(Boolean);
-  if (path4.length === 0) {
+  const path5 = ref.slice(1).split("/").filter(Boolean);
+  if (path5.length === 0) {
     return ctx.rootSchema;
   }
   const defsKey = ctx.version === "draft-2020-12" ? "$defs" : "definitions";
-  if (path4[0] === defsKey) {
-    const key = path4[1] === void 0 ? void 0 : decodeJSONPointerSegment(path4[1]);
+  if (path5[0] === defsKey) {
+    const key = path5[1] === void 0 ? void 0 : decodeJSONPointerSegment(path5[1]);
     if (!key || !ctx.defs[key]) {
       throw new Error(`Reference not found: ${ref}`);
     }
@@ -36966,9 +36966,9 @@ function parseUnifiedDiff(diffText) {
         current = null;
         continue;
       }
-      const path4 = newPath.startsWith("b/") ? newPath.slice(2) : newPath;
+      const path5 = newPath.startsWith("b/") ? newPath.slice(2) : newPath;
       current = {
-        path: path4,
+        path: path5,
         status: isNewFile ? "added" : "modified",
         added: []
       };
@@ -37079,8 +37079,8 @@ function looksPlaceholder(value) {
   if (/^[A-Z0-9_]+$/.test(text) && text.length < 12) return true;
   return false;
 }
-function isDotEnv(path4) {
-  const base = String(path4).split("/").pop() ?? String(path4);
+function isDotEnv(path5) {
+  const base = String(path5).split("/").pop() ?? String(path5);
   return base === ".env" || base.startsWith(".env.");
 }
 var emptyCatchRule = {
@@ -37336,7 +37336,7 @@ function compareFindings(a, b) {
 }
 
 // core/version.mjs
-var VERSION = "0.1.2";
+var VERSION = "0.2.0";
 
 // core/scan.mjs
 function truncate(value, max = 180) {
@@ -37668,6 +37668,311 @@ function formatRulesMarkdown(rules) {
   return lines.join("\n").trimEnd();
 }
 
+// core/history.mjs
+import { randomUUID } from "node:crypto";
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync
+} from "node:fs";
+import path3 from "node:path";
+var HISTORY_DIR = ".slopgate";
+var HISTORY_FILE = "events.jsonl";
+var HISTORY_VERSION = 1;
+var MAX_FINDINGS = 50;
+function isHistoryEnabled(options = {}) {
+  if (options.enabled === false) return false;
+  if (process.env.SLOPGATE_HISTORY === "0") return false;
+  return true;
+}
+function getHistoryDir(projectRoot) {
+  return path3.join(projectRoot, HISTORY_DIR);
+}
+function getHistoryPath(projectRoot) {
+  return path3.join(getHistoryDir(projectRoot), HISTORY_FILE);
+}
+function ensureHistoryDir(projectRoot) {
+  const dir = getHistoryDir(projectRoot);
+  mkdirSync(dir, { recursive: true, mode: 448 });
+  const ignorePath = path3.join(dir, ".gitignore");
+  if (!existsSync(ignorePath)) {
+    writeFileSync(ignorePath, "*\n", { mode: 384 });
+  }
+  return dir;
+}
+function compactFinding(finding) {
+  return {
+    rule: finding.rule,
+    severity: finding.severity,
+    file: finding.file,
+    line: finding.line,
+    ...finding.column ? { column: finding.column } : {}
+  };
+}
+function buildEvent(result, type, source, extra = {}) {
+  return {
+    v: HISTORY_VERSION,
+    id: randomUUID(),
+    ts: (/* @__PURE__ */ new Date()).toISOString(),
+    type,
+    source,
+    project: result.root,
+    mode: result.mode,
+    counts: result.counts,
+    score: result.score,
+    version: result.version,
+    findings: (result.findings ?? []).slice(0, MAX_FINDINGS).map(compactFinding),
+    ...extra
+  };
+}
+function appendEvent(projectRoot, event) {
+  ensureHistoryDir(projectRoot);
+  appendFileSync(getHistoryPath(projectRoot), `${JSON.stringify(event)}
+`, {
+    mode: 384
+  });
+  return event;
+}
+function recordScan(result, options = {}) {
+  if (!isHistoryEnabled(options)) return null;
+  if (!result?.root) return null;
+  try {
+    return appendEvent(
+      result.root,
+      buildEvent(result, "scan", options.source ?? "cli", {
+        sessionId: options.sessionId
+      })
+    );
+  } catch {
+    return null;
+  }
+}
+function readEvents(projectRoot) {
+  const file2 = getHistoryPath(projectRoot);
+  if (!existsSync(file2)) return [];
+  const raw = readFileSync(file2, "utf8");
+  const events = [];
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    try {
+      const event = JSON.parse(line);
+      if (event && typeof event === "object" && event.type) {
+        events.push(event);
+      }
+    } catch {
+    }
+  }
+  return events.sort((a, b) => String(a.ts).localeCompare(String(b.ts)));
+}
+
+// core/stats.mjs
+var DAY_MS = 24 * 60 * 60 * 1e3;
+var MAX_RECENT = 30;
+function emptyCounts() {
+  return { block: 0, warn: 0, info: 0, suppressed: 0 };
+}
+function addCounts(target, counts = {}) {
+  target.block += Number(counts.block) || 0;
+  target.warn += Number(counts.warn) || 0;
+  target.info += Number(counts.info) || 0;
+  target.suppressed += Number(counts.suppressed) || 0;
+}
+function localDayKey(date5) {
+  const year = date5.getFullYear();
+  const month = String(date5.getMonth() + 1).padStart(2, "0");
+  const day = String(date5.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+function startOfLocalDay(date5) {
+  const copy = new Date(date5);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+function normalizeDays(days) {
+  if (days === "all" || days === "All") return "all";
+  const value = Number(days);
+  if (!Number.isFinite(value) || value <= 0) return 30;
+  return Math.min(Math.floor(value), 365);
+}
+function aggregateFindings(events) {
+  const rules = /* @__PURE__ */ new Map();
+  const files = /* @__PURE__ */ new Map();
+  for (const event of events) {
+    for (const finding of event.findings ?? []) {
+      if (!finding?.rule) continue;
+      const rule = rules.get(finding.rule) ?? {
+        rule: finding.rule,
+        count: 0,
+        severity: finding.severity ?? "warn"
+      };
+      rule.count += 1;
+      if (finding.severity === "block") rule.severity = "block";
+      else if (finding.severity === "warn" && rule.severity !== "block") {
+        rule.severity = "warn";
+      }
+      rules.set(finding.rule, rule);
+      if (!finding.file) continue;
+      const file2 = files.get(finding.file) ?? {
+        file: finding.file,
+        count: 0,
+        block: 0,
+        warn: 0,
+        info: 0
+      };
+      file2.count += 1;
+      file2[finding.severity] = (file2[finding.severity] ?? 0) + 1;
+      files.set(finding.file, file2);
+    }
+  }
+  return {
+    topRules: [...rules.values()].sort(
+      (a, b) => b.count - a.count || a.rule.localeCompare(b.rule)
+    ),
+    topFiles: [...files.values()].sort(
+      (a, b) => b.count - a.count || a.file.localeCompare(b.file)
+    )
+  };
+}
+function buildDaily(scans, checks, { dayCount, now }) {
+  const today = startOfLocalDay(now);
+  const start = new Date(today);
+  start.setDate(start.getDate() - (dayCount - 1));
+  const buckets = /* @__PURE__ */ new Map();
+  const days = [];
+  for (let index = 0; index < dayCount; index += 1) {
+    const date5 = new Date(start);
+    date5.setDate(start.getDate() + index);
+    const key = localDayKey(date5);
+    const bucket = {
+      date: key,
+      block: 0,
+      warn: 0,
+      info: 0,
+      suppressed: 0,
+      scans: 0,
+      checks: 0,
+      blocks: 0
+    };
+    buckets.set(key, bucket);
+    days.push(bucket);
+  }
+  for (const scan2 of scans) {
+    const bucket = buckets.get(localDayKey(new Date(scan2.ts)));
+    if (!bucket) continue;
+    bucket.scans += 1;
+    addCounts(bucket, scan2.counts);
+  }
+  for (const check2 of checks) {
+    const bucket = buckets.get(localDayKey(new Date(check2.ts)));
+    if (!bucket) continue;
+    bucket.checks += 1;
+    if (check2.blocked && !check2.waived) bucket.blocks += 1;
+  }
+  return days;
+}
+function compactEvent(event) {
+  const topFinding = event.findings?.[0];
+  return {
+    id: event.id,
+    ts: event.ts,
+    type: event.type,
+    source: event.source ?? "unknown",
+    action: event.action,
+    blocked: Boolean(event.blocked),
+    waived: Boolean(event.waived),
+    score: event.score,
+    mode: event.mode,
+    counts: event.counts ?? emptyCounts(),
+    findingsCount: event.findings?.length ?? 0,
+    topRule: topFinding?.rule ?? null,
+    topFile: topFinding?.file ?? null
+  };
+}
+function buildStats(events, { days = 30, now = /* @__PURE__ */ new Date() } = {}) {
+  const range = normalizeDays(days);
+  const chartDays = range === "all" ? 90 : range;
+  let since = null;
+  if (range !== "all") {
+    since = startOfLocalDay(now);
+    since.setDate(since.getDate() - (range - 1));
+  }
+  const filtered = events.filter((event) => {
+    const timestamp = new Date(event.ts);
+    if (Number.isNaN(timestamp.getTime())) return false;
+    return !since || timestamp >= since;
+  });
+  const scans = filtered.filter((event) => event.type === "scan");
+  const checks = filtered.filter((event) => event.type === "check");
+  const blockedChecks = checks.filter((event) => event.blocked && !event.waived);
+  const waivedChecks = checks.filter((event) => event.waived);
+  const cleanChecks = checks.filter((event) => !event.blocked && !event.waived);
+  const findings = emptyCounts();
+  for (const scan2 of scans) addCounts(findings, scan2.counts);
+  const blockedFindings = emptyCounts();
+  for (const check2 of blockedChecks) addCounts(blockedFindings, check2.counts);
+  const averageScore = scans.length ? Math.round(
+    scans.reduce((sum, event) => sum + (Number(event.score) || 0), 0) / scans.length
+  ) : null;
+  const { topRules, topFiles } = aggregateFindings([...scans, ...blockedChecks]);
+  const sources = {};
+  for (const event of filtered) {
+    const source = event.source ?? "unknown";
+    sources[source] = (sources[source] ?? 0) + 1;
+  }
+  const recent = [...filtered].sort((a, b) => String(b.ts).localeCompare(String(a.ts))).slice(0, MAX_RECENT).map(compactEvent);
+  return {
+    project: filtered.at(-1)?.project ?? events.at(-1)?.project ?? null,
+    generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    days: range,
+    chartDays,
+    since: since ? since.toISOString() : null,
+    totals: {
+      events: filtered.length,
+      scans: scans.length,
+      checks: checks.length,
+      blocks: blockedChecks.length,
+      waived: waivedChecks.length,
+      cleanChecks: cleanChecks.length,
+      findings,
+      blockedFindings,
+      avgScore: averageScore
+    },
+    blockRate: checks.length ? blockedChecks.length / checks.length : 0,
+    topRules: topRules.slice(0, 8),
+    topFiles: topFiles.slice(0, 8),
+    daily: buildDaily(scans, checks, { dayCount: chartDays, now }),
+    recent,
+    sources
+  };
+}
+function rangeLabel(stats) {
+  return stats.days === "all" ? "all time" : `last ${stats.days} days`;
+}
+function formatStatsMarkdown(stats) {
+  if (!stats.totals.events) {
+    return `## SlopGate stats \u2014 ${rangeLabel(stats)}
+
+No SlopGate history yet. Run a scan or let Codex finish a turn.`;
+  }
+  const { totals } = stats;
+  const findings = totals.findings;
+  const findingTotal = findings.block + findings.warn + findings.info;
+  const topRules = stats.topRules.slice(0, 5).map((item) => `${item.rule} (${item.count})`).join(", ");
+  return [
+    `## SlopGate stats \u2014 ${rangeLabel(stats)}`,
+    "",
+    `- Scans: **${totals.scans}**`,
+    `- Handoff checks: **${totals.checks}** (${totals.blocks} blocked, ${totals.cleanChecks} clean${totals.waived ? `, ${totals.waived} waived` : ""})`,
+    `- Findings from scans: **${findingTotal}** (${findings.block} block, ${findings.warn} warn, ${findings.info} info)`,
+    `- Blockers stopped at the gate: **${totals.blockedFindings.block}**`,
+    `- Average scan score: **${totals.avgScore ?? "\u2014"}/100**`,
+    topRules ? `- Top rules: ${topRules}` : null,
+    `- Project: \`${stats.project ?? "unknown"}\``
+  ].filter(Boolean).join("\n");
+}
+
 // server/index.mjs
 var READ_ONLY_ANNOTATIONS = {
   readOnlyHint: true,
@@ -37677,7 +37982,7 @@ var READ_ONLY_ANNOTATIONS = {
 };
 function resolveProjectCwd(requestedCwd) {
   const candidate = requestedCwd || process.env.SLOPGATE_CWD || process.env.CODEX_WORKSPACE_ROOT || process.env.PWD || process.cwd();
-  return path3.resolve(candidate);
+  return path4.resolve(candidate);
 }
 function errorResult(error62) {
   return {
@@ -37724,6 +38029,7 @@ server.registerTool(
         range,
         paths: paths ?? []
       });
+      recordScan(result, { source: "mcp" });
       return {
         content: [
           {
@@ -37755,6 +38061,7 @@ server.registerTool(
         cwd: resolveProjectCwd(cwd),
         path: filePath
       });
+      recordScan(result, { source: "mcp" });
       return {
         content: [
           {
@@ -37763,6 +38070,37 @@ server.registerTool(
           }
         ],
         structuredContent: result
+      };
+    } catch (error62) {
+      return errorResult(error62);
+    }
+  }
+);
+server.registerTool(
+  "stats",
+  {
+    title: "Summarize SlopGate history",
+    description: "Summarize local SlopGate history: scans, handoff checks, blockers stopped, top rules, top files, and recent activity. History stays in the project's .slopgate directory.",
+    inputSchema: {
+      cwd: external_exports.string().optional().describe("Absolute path to the project root."),
+      days: external_exports.union([external_exports.number().int().positive(), external_exports.literal("all")]).optional().describe("Number of days to include, or 'all'. Defaults to 30.")
+    },
+    annotations: READ_ONLY_ANNOTATIONS
+  },
+  async ({ cwd, days }) => {
+    try {
+      const projectRoot = resolveProjectCwd(cwd);
+      const stats = buildStats(readEvents(projectRoot), {
+        days: days ?? 30
+      });
+      return {
+        content: [
+          {
+            type: "text",
+            text: formatStatsMarkdown(stats)
+          }
+        ],
+        structuredContent: stats
       };
     } catch (error62) {
       return errorResult(error62);

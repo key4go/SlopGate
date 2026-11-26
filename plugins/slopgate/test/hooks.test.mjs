@@ -10,6 +10,7 @@ import {
   makeRepo,
   write,
 } from "./helpers.mjs";
+import { readEvents } from "../core/index.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const pluginDir = path.resolve(here, "..");
@@ -31,6 +32,10 @@ function runHook(name, input) {
     stderr: result.stderr.trim(),
     status: result.status,
   };
+}
+
+function checkEvents(repo) {
+  return readEvents(repo).filter((event) => event.type === "check");
 }
 
 test("Stop hook blocks once when blockers are present", () => {
@@ -191,6 +196,154 @@ test("git guard denies a push containing a sloppy commit", () => {
       payload.hookSpecificOutput.permissionDecisionReason,
       /empty-catch/,
     );
+  } finally {
+    cleanup(repo);
+  }
+});
+
+test("Stop hook records a blocked handoff check", () => {
+  const repo = makeRepo();
+  try {
+    write(repo, "src/app.ts", "try { risky(); } catch (e) {}\n");
+
+    runHook("stop-check.mjs", {
+      cwd: repo,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+      session_id: "session-blocked",
+    });
+
+    const checks = checkEvents(repo);
+    assert.equal(checks.length, 1);
+    assert.equal(checks[0].action, "handoff");
+    assert.equal(checks[0].blocked, true);
+    assert.equal(checks[0].waived, false);
+    assert.equal(checks[0].sessionId, "session-blocked");
+    assert.equal(checks[0].source, "hook");
+    assert.equal(checks[0].counts.block, 1);
+  } finally {
+    cleanup(repo);
+  }
+});
+
+test("Stop hook records a waived handoff check after continuation", () => {
+  const repo = makeRepo();
+  try {
+    write(repo, "src/app.ts", "try { risky(); } catch (e) {}\n");
+
+    runHook("stop-check.mjs", {
+      cwd: repo,
+      hook_event_name: "Stop",
+      stop_hook_active: true,
+      session_id: "session-waived",
+    });
+
+    const checks = checkEvents(repo);
+    assert.equal(checks.length, 1);
+    assert.equal(checks[0].action, "handoff");
+    assert.equal(checks[0].blocked, false);
+    assert.equal(checks[0].waived, true);
+    assert.equal(checks[0].sessionId, "session-waived");
+    assert.equal(checks[0].counts.block, 1);
+  } finally {
+    cleanup(repo);
+  }
+});
+
+test("Stop hook records a clean handoff check", () => {
+  const repo = makeRepo();
+  try {
+    runHook("stop-check.mjs", {
+      cwd: repo,
+      hook_event_name: "Stop",
+      stop_hook_active: false,
+      session_id: "session-clean",
+    });
+
+    const checks = checkEvents(repo);
+    assert.equal(checks.length, 1);
+    assert.equal(checks[0].action, "handoff");
+    assert.equal(checks[0].blocked, false);
+    assert.equal(checks[0].waived, false);
+    assert.equal(checks[0].counts.block, 0);
+    assert.equal(checks[0].score, 100);
+  } finally {
+    cleanup(repo);
+  }
+});
+
+test("git guard records a blocked commit check", () => {
+  const repo = makeRepo();
+  try {
+    write(repo, "src/app.ts", "try { risky(); } catch (e) {}\n");
+    git(repo, "add", "src/app.ts");
+
+    runHook("git-guard.mjs", {
+      cwd: repo,
+      hook_event_name: "PreToolUse",
+      tool_name: "Bash",
+      tool_input: { command: "git commit -m 'check this'" },
+      session_id: "session-commit",
+    });
+
+    const checks = checkEvents(repo);
+    assert.equal(checks.length, 1);
+    assert.equal(checks[0].action, "commit");
+    assert.equal(checks[0].blocked, true);
+    assert.equal(checks[0].waived, false);
+    assert.equal(checks[0].sessionId, "session-commit");
+    assert.equal(checks[0].source, "hook");
+  } finally {
+    cleanup(repo);
+  }
+});
+
+test("git guard records a clean commit check", () => {
+  const repo = makeRepo();
+  try {
+    write(repo, "src/app.ts", "export const fine = true;\n");
+    git(repo, "add", "src/app.ts");
+
+    runHook("git-guard.mjs", {
+      cwd: repo,
+      hook_event_name: "PreToolUse",
+      tool_name: "Bash",
+      tool_input: { command: "git commit -m 'clean change'" },
+      session_id: "session-commit-clean",
+    });
+
+    const checks = checkEvents(repo);
+    assert.equal(checks.length, 1);
+    assert.equal(checks[0].action, "commit");
+    assert.equal(checks[0].blocked, false);
+    assert.equal(checks[0].waived, false);
+    assert.equal(checks[0].counts.block, 0);
+  } finally {
+    cleanup(repo);
+  }
+});
+
+test("git guard records a blocked push check", () => {
+  const repo = makeRepo();
+  try {
+    write(repo, "src/app.ts", "try { risky(); } catch (e) {}\n");
+    git(repo, "add", "src/app.ts");
+    git(repo, "commit", "-qm", "sloppy change");
+
+    runHook("git-guard.mjs", {
+      cwd: repo,
+      hook_event_name: "PreToolUse",
+      tool_name: "Bash",
+      tool_input: { command: "git push origin main" },
+      session_id: "session-push",
+    });
+
+    const checks = checkEvents(repo);
+    assert.equal(checks.length, 1);
+    assert.equal(checks[0].action, "push");
+    assert.equal(checks[0].blocked, true);
+    assert.equal(checks[0].waived, false);
+    assert.equal(checks[0].sessionId, "session-push");
   } finally {
     cleanup(repo);
   }
