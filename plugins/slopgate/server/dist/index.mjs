@@ -37336,7 +37336,7 @@ function compareFindings(a, b) {
 }
 
 // core/version.mjs
-var VERSION = "0.1.0";
+var VERSION = "0.1.2";
 
 // core/scan.mjs
 function truncate(value, max = 180) {

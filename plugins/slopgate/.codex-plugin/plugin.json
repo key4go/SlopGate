@@ -1,0 +1,37 @@
+{
+  "name": "slopgate",
+  "version": "0.1.2",
+  "description": "Catch AI code smell before Codex finishes.",
+  "author": {
+    "name": "SlopGate",
+    "url": "https://github.com/key4go/SlopGate"
+  },
+  "homepage": "https://github.com/key4go/SlopGate",
+  "repository": "https://github.com/key4go/SlopGate",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "ai",
+    "lint",
+    "diff",
+    "code-quality"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.codex-plugin/mcp.json",
+  "interface": {
+    "displayName": "SlopGate",
+    "shortDescription": "Catch AI code smell before Codex finishes.",
+    "longDescription": "SlopGate scans the current git diff for empty catches, hardcoded secrets, disabled type checks, placeholders, test focus/skip, and debug leftovers. It blocks Codex from finishing or committing while blockers remain.",
+    "developerName": "SlopGate",
+    "category": "Productivity",
+    "capabilities": [
+      "Instructions",
+      "Lifecycle hooks"
+    ],
+    "defaultPrompt": [
+      "Check this change with SlopGate before calling it done."
+    ],
+    "brandColor": "#F97316"
+  }
+}

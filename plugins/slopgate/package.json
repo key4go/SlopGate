@@ -1,6 +1,6 @@
 {
   "name": "slopgate",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "description": "Catch AI code smell before Codex finishes.",
