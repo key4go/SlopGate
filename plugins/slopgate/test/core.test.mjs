@@ -277,3 +277,39 @@ test("git command parsing ignores quoted text and understands global options", (
     false,
   );
 });
+
+test("scans Swift changes and Swift test conventions", async () => {
+  const repo = makeRepo();
+  try {
+    // slopgate-ignore-next-line empty-catch -- intentional scanner test fixture
+    write(repo, "Sources/App.swift", `do { try run() } catch {}
+let apiKey = "${"abc123def456ghi789"}"
+// ${"TODO"}: implement
+fatalError("${"not " + "implemented"}")
+print("debug")
+`);
+    write(repo, "AppTests.swift", `@Test(.disabled("broken")) func example() {}
+func testExample() throws { throw XCTSkip("broken") }
+`);
+    const result = await scan({ cwd: repo, mode: "all" });
+    assert.deepEqual(result.findings.filter((item) => item.file === "Sources/App.swift").map((item) => item.rule).sort(),
+      ["debug-leftover", "empty-catch", "hardcoded-secret", "placeholder", "placeholder"].sort());
+    assert.equal(result.findings.filter((item) => item.file === "AppTests.swift" && item.rule === "test-focus").length, 2);
+    assert.ok((await scanFile({ cwd: repo, path: "Sources/App.swift" })).findings.some((item) => item.rule === "empty-catch"));
+  } finally {
+    cleanup(repo);
+  }
+});
+
+test("recognizes Swift test targets without treating Contest.swift as a test", async () => {
+  const repo = makeRepo();
+  try {
+    write(repo, "MyAppTests/NetworkChecks.swift", '@Test(.disabled("reason")) func check() {}\n');
+    write(repo, "Sources/Contest.swift", 'print("diagnostic")\n');
+    const result = await scan({ cwd: repo, mode: "all" });
+    assert.ok(result.findings.some((item) => item.file === "MyAppTests/NetworkChecks.swift" && item.rule === "test-focus"));
+    assert.equal(result.findings.find((item) => item.file === "Sources/Contest.swift" && item.rule === "debug-leftover")?.severity, "warn");
+  } finally {
+    cleanup(repo);
+  }
+});

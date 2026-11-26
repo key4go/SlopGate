@@ -2,7 +2,7 @@
 
 **Your AI says it's done. SlopGate checks the diff.**
 
-SlopGate is a local, diff-first smoke detector for AI-assisted JavaScript and TypeScript. It runs the moment Codex tries to finish, commit, or push, and blocks the predictable stuff that looks fine in review but breaks later:
+SlopGate is a local, diff-first smoke detector for AI-assisted JavaScript, TypeScript, and Swift. It runs the moment Codex tries to finish, commit, or push, and blocks the predictable stuff that looks fine in review but breaks later:
 
 - a swallowed `catch`
 - a hardcoded API key
@@ -211,7 +211,7 @@ The MCP server is bundled so the installed plugin does not need `node_modules` a
 
 ## Limitations
 
-- **JavaScript and TypeScript only.** Python, Go, Rust, and AST-based rules are future work.
+- **JavaScript, TypeScript, and Swift.** Python, Go, Rust, and AST-based rules are future work.
 - **Diff-first, not a full audit.** SlopGate checks the lines you just changed, not the entire codebase.
 - **Not a type checker or security auditor.** It catches specific, high-signal smells. It does not replace `tsc`, ESLint, tests, or a real security review.
 - **Pre-existing uncommitted changes count.** Until a baseline is added, the Stop hook scans all uncommitted changes in the repository, including work you had already started.

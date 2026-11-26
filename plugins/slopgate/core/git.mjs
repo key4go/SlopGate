@@ -52,6 +52,7 @@ const SOURCE_EXTENSIONS = new Set([
   ".cjs",
   ".mts",
   ".cts",
+  ".swift",
 ]);
 
 function normalizePath(value) {
@@ -242,6 +243,8 @@ export function isTestPath(relPath) {
 
   if (/(^|\/)(?:__tests__|tests?|specs?)\//i.test(normalized)) return true;
   if (/\.(?:test|spec)\.[cm]?[jt]sx?$/i.test(base)) return true;
+  if (/\.swift$/i.test(base) &&
+      (/(?:^|\/)[^/]*Tests?\//.test(normalized) || /Tests?\.swift$/.test(base) || /^tests?\.swift$/i.test(base))) return true;
   if (/_(?:test|spec)\.(?:py|rb|go)$/i.test(base)) return true;
 
   return false;

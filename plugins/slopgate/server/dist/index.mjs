@@ -36717,7 +36717,8 @@ var SOURCE_EXTENSIONS = /* @__PURE__ */ new Set([
   ".mjs",
   ".cjs",
   ".mts",
-  ".cts"
+  ".cts",
+  ".swift"
 ]);
 function normalizePath(value) {
   return String(value).replaceAll("\\", "/");
@@ -36844,6 +36845,7 @@ function isTestPath(relPath) {
   const base = normalized.split("/").pop() ?? normalized;
   if (/(^|\/)(?:__tests__|tests?|specs?)\//i.test(normalized)) return true;
   if (/\.(?:test|spec)\.[cm]?[jt]sx?$/i.test(base)) return true;
+  if (/\.swift$/i.test(base) && (/(?:^|\/)[^/]*Tests?\//.test(normalized) || /Tests?\.swift$/.test(base) || /^tests?\.swift$/i.test(base))) return true;
   if (/_(?:test|spec)\.(?:py|rb|go)$/i.test(base)) return true;
   return false;
 }
@@ -37214,7 +37216,9 @@ var placeholderRule = {
       /(?:\/\/|\/\*|\*)\s*(?:TODO|FIXME|XXX|HACK)\b/gi,
       /\bnot implemented\b/gi,
       /lorem ipsum/gi,
-      /\bthrow\s+new\s+Error\(\s*["'`](?:todo|not implemented|coming soon)/gi
+      /\bthrow\s+new\s+Error\(\s*["'`](?:todo|not implemented|coming soon)/gi,
+      // slopgate-ignore-next-line placeholder -- this pattern detects unfinished Swift code
+      ...ctx.path.toLowerCase().endsWith(".swift") ? [/\bfatalError\s*\(\s*"(?:todo|not implemented|coming soon)/gi] : []
     ]);
   }
 };
@@ -37249,6 +37253,12 @@ var testFocusRule = {
       while ((match = skip.exec(text)) !== null) {
         add(index + 1, match.index + 1, text, "warn");
       }
+      if (ctx.path.toLowerCase().endsWith(".swift")) {
+        const swiftSkip = /(?:\bXCTSkip(?:If|Unless)?\s*\(|\.disabled\s*\()/g;
+        while ((match = swiftSkip.exec(text)) !== null) {
+          add(index + 1, match.index + 1, text, "warn");
+        }
+      }
       const xit = /\b(?:xit|xdescribe|fit|fdescribe)\s*\(/g;
       while ((match = xit.exec(text)) !== null) {
         add(index + 1, match.index + 1, text, "warn");
@@ -37269,7 +37279,8 @@ var debugLeftoverRule = {
       [
         /console\.(?:log|debug|dir|trace)\s*\(/g,
         /\bdebugger\b/g,
-        /\balert\s*\(/g
+        /\balert\s*\(/g,
+        ...ctx.path.toLowerCase().endsWith(".swift") ? [/\b(?:print|debugPrint|dump)\s*\(/g] : []
       ],
       {
         severityFor: () => ctx.isTest ? "info" : "warn"

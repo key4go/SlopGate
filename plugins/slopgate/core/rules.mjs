@@ -239,6 +239,8 @@ const placeholderRule = {
       /\bnot implemented\b/gi,
       /lorem ipsum/gi,
       /\bthrow\s+new\s+Error\(\s*["'`](?:todo|not implemented|coming soon)/gi,
+      // slopgate-ignore-next-line placeholder -- this pattern detects unfinished Swift code
+      ...(ctx.path.toLowerCase().endsWith(".swift") ? [/\bfatalError\s*\(\s*"(?:todo|not implemented|coming soon)/gi] : []),
     ]);
   },
 };
@@ -280,6 +282,13 @@ const testFocusRule = {
         add(index + 1, match.index + 1, text, "warn");
       }
 
+      if (ctx.path.toLowerCase().endsWith(".swift")) {
+        const swiftSkip = /(?:\bXCTSkip(?:If|Unless)?\s*\(|\.disabled\s*\()/g;
+        while ((match = swiftSkip.exec(text)) !== null) {
+          add(index + 1, match.index + 1, text, "warn");
+        }
+      }
+
       const xit = /\b(?:xit|xdescribe|fit|fdescribe)\s*\(/g;
       while ((match = xit.exec(text)) !== null) {
         add(index + 1, match.index + 1, text, "warn");
@@ -303,6 +312,7 @@ const debugLeftoverRule = {
         /console\.(?:log|debug|dir|trace)\s*\(/g,
         /\bdebugger\b/g,
         /\balert\s*\(/g,
+        ...(ctx.path.toLowerCase().endsWith(".swift") ? [/\b(?:print|debugPrint|dump)\s*\(/g] : []),
       ],
       {
         severityFor: () => (ctx.isTest ? "info" : "warn"),
