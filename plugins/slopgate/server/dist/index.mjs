@@ -37094,7 +37094,7 @@ var emptyCatchRule = {
   detect(ctx) {
     const findings = [];
     const seenLines = /* @__PURE__ */ new Set();
-    const emptyCatch = /catch\s*(?:\([^)]*\))?\s*\{\s*(?:(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/)\s*)*\}/g;
+    const emptyCatch = /catch\s*(?:\([^)\n]*\)|(?:let|var)\s+[\w$]+(?:\s+as\s+[^\{\n]+)?(?:\s+where\s+[^\{\n]+)?|where\s+[^\{\n]+)?\s*\{\s*(?:(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/)\s*)*\}/g;
     let match;
     while ((match = emptyCatch.exec(ctx.text)) !== null) {
       const line = lineOfIndex(ctx.text, match.index);
@@ -37254,7 +37254,7 @@ var testFocusRule = {
         add(index + 1, match.index + 1, text, "warn");
       }
       if (ctx.path.toLowerCase().endsWith(".swift")) {
-        const swiftSkip = /(?:\bXCTSkip(?:If|Unless)?\s*\(|\.disabled\s*\()/g;
+        const swiftSkip = /(?:\bXCTSkip(?:If|Unless)?\s*\(|@(?:Test|Suite)\s*\([^)\n]*\.disabled\s*\()/g;
         while ((match = swiftSkip.exec(text)) !== null) {
           add(index + 1, match.index + 1, text, "warn");
         }
@@ -37347,7 +37347,7 @@ function compareFindings(a, b) {
 }
 
 // core/version.mjs
-var VERSION = "0.2.0";
+var VERSION = "0.2.1";
 
 // core/scan.mjs
 function truncate(value, max = 180) {

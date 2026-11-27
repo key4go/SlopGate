@@ -313,3 +313,50 @@ test("recognizes Swift test targets without treating Contest.swift as a test", a
     cleanup(repo);
   }
 });
+
+test("does not flag SwiftUI .disabled modifiers in Swift tests", async () => {
+  const repo = makeRepo();
+  try {
+    write(
+      repo,
+      "MyAppTests/UITests.swift",
+      `Button("Save").disabled(!isEnabled)\n`,
+    );
+
+    const result = await scan({ cwd: repo, mode: "all" });
+    assert.equal(
+      result.findings.filter((item) => item.rule === "test-focus").length,
+      0,
+    );
+  } finally {
+    cleanup(repo);
+  }
+});
+
+test("catches empty Swift catch bindings and where clauses", async () => {
+  const repo = makeRepo();
+  try {
+    // slopgate-ignore-next-line empty-catch -- intentional scanner test fixture
+    write(repo, "Sources/Binding.swift", `func f() { do { try run() } catch let error {} }\n`);
+    // slopgate-ignore-next-line empty-catch -- intentional scanner test fixture
+    write(repo, "Sources/Cast.swift", `func f() { do { try run() } catch let error as NSError {} }\n`);
+    // slopgate-ignore-next-line empty-catch -- intentional scanner test fixture
+    write(repo, "Sources/Where.swift", `func f() { do { try run() } catch where shouldIgnore {} }\n`);
+
+    const result = await scan({ cwd: repo, mode: "all" });
+    for (const file of [
+      "Sources/Binding.swift",
+      "Sources/Cast.swift",
+      "Sources/Where.swift",
+    ]) {
+      assert.ok(
+        result.findings.some(
+          (item) => item.file === file && item.rule === "empty-catch",
+        ),
+        `${file} should produce an empty-catch finding`,
+      );
+    }
+  } finally {
+    cleanup(repo);
+  }
+});
